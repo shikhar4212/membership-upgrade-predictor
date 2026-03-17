@@ -142,7 +142,7 @@ col1, col2 = st.sidebar.columns([1,2])
 
 st.sidebar.markdown("### So what is this for?")
 
-st.sidebar.markdown("This dashboard analyzes customer behavior and service experience to estimate the probability that a user will upgrade to a premium membership tier. By combining demographic information, ordering patterns, spending behavior, and service feedback, the model identifies customers who are most likely to benefit from targeted upgrade offers. The tool allows users to simulate different customer profiles and generate actionable insights that help businesses design personalized marketing strategies, improve retention, and maximize customer lifetime value.")
+st.sidebar.markdown("This dashboard analyzes customer behavior and service experience to estimate the probability that a user will upgrade to a premium membership tier. By combining demographic information, ordering patterns, spending behavior, and service feedback, the model identifies customers who are most likely to benefit from targeted upgrade offers. The tool allows users to simulate different customer profiles and generate actionable insights that help businesses design personalized.")
 
 
 st.sidebar.markdown("### Made By")
