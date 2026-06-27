@@ -31,10 +31,6 @@ st.markdown("""
 /* Remove top padding from sidebar */
 section[data-testid="stSidebar"] > div:first-child {
     padding-top: 0rem;
-            
-}
-            section[data-testid="stSidebar"] > div:first-child {
-    padding-top: 0rem;
     margin-top: -20px;
 }
 
@@ -125,7 +121,15 @@ st.sidebar.markdown("""
 
 
 """, unsafe_allow_html=True)
-model = joblib.load("upgrade_model.pkl")
+@st.cache_resource
+def load_model():
+    return joblib.load("upgrade_model.pkl")
+
+try:
+    model = load_model()
+except Exception as e:
+    st.error(f"Could not load model 'upgrade_model.pkl': {e}")
+    st.stop()
 
 st.title("Customer Upgrade Prediction Dashboard")
 
@@ -197,7 +201,7 @@ presets = {
         "purchase_freq":5.1,
         "spending_score":39,
         "order_value":60.53,
-        "weekend_orders":420,
+        "weekend_orders":14,
         "rating":3,
         "delivery_time":53.5,
         "complaints":0,
@@ -268,28 +272,16 @@ Rahul’s app rating is moderate (3/5), and his delivery experience has been fai
 
 Raj is a 38-year-old professional who frequently relies on food delivery as part of his daily routine. With an annual income of around ₹51K, he values quality and convenience when ordering meals.
 
-He orders food over five times a week, indicating very high engagement with the platform. Arjun tends to spend more per order (around ₹75) compared to typical users, often choosing flavorful cuisines like Mexican. While he occasionally uses discounts, his decisions are driven more by taste and experience rather than price sensitivity.
+He orders food over five times a week, indicating very high engagement with the platform. Raj tends to spend more per order (around ₹75) compared to typical users, often choosing flavorful cuisines like Mexican. While he occasionally uses discounts, his decisions are driven more by taste and experience rather than price sensitivity.
 
-Arjun consistently rates the app very highly (5/5), reflecting strong satisfaction with the service. His orders are delivered relatively quickly, and he has never raised complaints, suggesting a smooth and reliable experience.
+Raj consistently rates the app very highly (5/5), reflecting strong satisfaction with the service. His orders are delivered relatively quickly, and he has never raised complaints, suggesting a smooth and reliable experience.
 
         """)
 
 with col1:
     if presets[preset]:
-        st.session_state.age = presets[preset]["age"]
-        st.session_state.gender = presets[preset]["gender"]
-        st.session_state.income = presets[preset]["income"]
-        st.session_state.purchase_freq = presets[preset]["purchase_freq"]
-        st.session_state.spending_score = presets[preset]["spending_score"]
-        st.session_state.order_value = presets[preset]["order_value"]
-        st.session_state.weekend_orders = presets[preset]["weekend_orders"]
-        st.session_state.rating = presets[preset]["rating"]
-        st.session_state.delivery_time = presets[preset]["delivery_time"]
-        st.session_state.complaints = presets[preset]["complaints"]
-        st.session_state.tips = presets[preset]["tips"]
-        st.session_state.cuisine = presets[preset]["cuisine"]
-        st.session_state.discount_usage = presets[preset]["discount_usage"]
-        st.session_state.cuisines_tried = presets[preset]["cuisines_tried"]
+        for field, value in presets[preset].items():
+            st.session_state[field] = value
 
         
 
@@ -437,7 +429,7 @@ with col1:
 
         tip_ratio = tips / (order_value + 1)
 
-        weekend_ratio = weekend_orders/purchase_freq*12
+        weekend_ratio = weekend_orders / (purchase_freq + 1) * 12
 
         # Create dataframe with ALL required features
         
@@ -466,11 +458,18 @@ with col1:
         })
         st.write("Dashboard Input Row:")
         st.write(new_customer)
-        prob = model.predict_proba(new_customer)[0][1]    
+
+        try:
+            prob = model.predict_proba(new_customer)[0][1]
+        except Exception as e:
+            st.error(f"Prediction failed: {e}")
+            st.stop()
+
         st.subheader("Prediction Result")
 
         st.metric("Upgrade Probability", f"{round(prob*100,2)}%")
 
+        # Thresholds: >70% high intent, 40-70% on the fence, <40% unlikely
         if prob > 0.7:
             st.success("High upgrade likelihood")
 
