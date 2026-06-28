@@ -1,4 +1,4 @@
-"""Premium Membership Upgrade — Data Analytics Dashboard.
+"""Premium Membership Upgrade - Data Analytics Dashboard.
 
 A business analytics app over food-delivery customer data. It explains WHO upgrades
 to premium and WHY, scores every customer with a trained model, and turns those
@@ -83,13 +83,22 @@ TEAM = "The Muggles"
 TEAM_MEMBERS = ["Ankit Nandi", "Shikhar Panthari", "Abhinav Singh"]
 
 PITCHABLE_SEGMENTS = ["High intent", "Persuadable"]
+
+# One locked accent (deep violet, from the CraveConnect deck) + neutrals.
+# Semantic colors used ONLY for true status (risk / action), never decoration.
+ACCENT = "#4c1d95"
+ACCENT_SOFT = "#7c3aed"
+INK = "#1c1917"
+MUTED = "#78716c"
+LINE = "#e7e5e4"
 SEGMENT_COLORS = {
-    "High intent": "#047857",
-    "Persuadable": "#1d4ed8",
+    "High intent": "#4c1d95",
+    "Persuadable": "#7c3aed",
     "Service recovery": "#b45309",
     "Experience risk": "#b91c1c",
-    "Low priority": "#94a3b8",
+    "Low priority": "#a8a29e",
 }
+PLOTLY_FONT = "Outfit, system-ui, sans-serif"
 
 MODEL_WARNING = (
     "Use this model as a targeting aid, not an autopilot. The data carries strong "
@@ -124,7 +133,7 @@ def load_customer_data():
 def add_engineered_features(df):
     """Create the behavioral features used by the trained model.
 
-    Kept identical to train_model.py — editing one side without the other
+    Kept identical to train_model.py - editing one side without the other
     silently breaks scoring.
     """
     scored = df.copy()
@@ -284,13 +293,14 @@ def style_fig(fig, height=360):
     fig.update_layout(
         height=height,
         margin=dict(l=10, r=10, t=40, b=10),
-        plot_bgcolor="white",
-        paper_bgcolor="white",
-        font=dict(color="#0f172a"),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color=INK, family=PLOTLY_FONT, size=13),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        colorway=[ACCENT, ACCENT_SOFT, "#a8a29e", "#b45309", "#b91c1c", "#0f766e"],
     )
-    fig.update_xaxes(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
-    fig.update_yaxes(gridcolor="#e2e8f0", zerolinecolor="#cbd5e1")
+    fig.update_xaxes(gridcolor=LINE, zerolinecolor="#d6d3d1", linecolor=LINE)
+    fig.update_yaxes(gridcolor=LINE, zerolinecolor="#d6d3d1", linecolor=LINE)
     return fig
 
 
@@ -298,46 +308,65 @@ def inject_css():
     st.markdown(
         """
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
         :root {
-            --app-bg:#eef2f7; --surface:#fff; --border:#cbd5e1; --border-strong:#94a3b8;
-            --text:#0f172a; --muted:#475569; --primary:#1d4ed8; --primary-dark:#1e3a8a;
-            --warning:#b45309;
+            --bg:#f7f7f5; --surface:#ffffff; --line:#e7e5e4; --line-strong:#d6d3d1;
+            --ink:#1c1917; --muted:#78716c; --accent:#4c1d95; --accent-soft:#f5f3ff;
+            --warn:#b45309; --warn-soft:#fffbeb; --good:#15803d; --good-soft:#f0fdf4;
+            --radius:10px;
         }
-        .stApp { background: var(--app-bg); color: var(--text); }
-        .block-container { padding-top: 1.1rem; padding-bottom: 2rem; max-width: 1440px; }
-        h1,h2,h3,h4,h5,h6,p,label,span { color: var(--text); }
-        [data-testid="stSidebar"] { background:#dbeafe; border-right:1px solid #93c5fd; }
-        [data-testid="stSidebar"] p,[data-testid="stSidebar"] label,[data-testid="stSidebar"] span { color:#0f172a; }
+        html, body, [class*="css"], .stApp { font-family:'Outfit', system-ui, sans-serif; }
+        .stApp { background: var(--bg); color: var(--ink); }
+        .block-container { padding-top:1.4rem; padding-bottom:2.5rem; max-width:1440px; }
+        h1,h2,h3,h4,h5,h6 { color:var(--ink); letter-spacing:-0.02em; font-weight:700; }
+        p,label,span,li { color:var(--ink); }
+
+        /* Sidebar: neutral, not baby-blue */
+        [data-testid="stSidebar"] { background:var(--surface); border-right:1px solid var(--line); }
+        [data-testid="stSidebar"] p,[data-testid="stSidebar"] label,[data-testid="stSidebar"] span { color:var(--ink); }
+
+        /* Metric: hairline card, mono number, no candy top-border */
         div[data-testid="stMetric"] {
-            border:1px solid var(--border); border-top:4px solid var(--primary);
-            border-radius:8px; padding:14px 16px; background:var(--surface);
-            box-shadow:0 1px 2px rgba(15,23,42,.08);
+            border:1px solid var(--line); border-radius:var(--radius);
+            padding:14px 16px; background:var(--surface);
+            box-shadow:0 1px 2px rgba(28,25,23,.04);
         }
-        div[data-testid="stMetric"] [data-testid="stMetricLabel"] { color:var(--muted); font-weight:700; }
-        div[data-testid="stMetric"] [data-testid="stMetricValue"] { color:var(--text); font-weight:800; }
-        .stTabs [data-baseweb="tab-list"] { gap:8px; border-bottom:1px solid var(--border-strong); }
+        div[data-testid="stMetric"] [data-testid="stMetricLabel"] {
+            color:var(--muted); font-weight:600; font-size:.72rem;
+            text-transform:uppercase; letter-spacing:.06em;
+        }
+        div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+            color:var(--ink); font-weight:700; font-family:'JetBrains Mono', monospace;
+            letter-spacing:-.01em;
+        }
+
+        /* Tabs: clean underline, no folder chrome */
+        .stTabs [data-baseweb="tab-list"] { gap:4px; border-bottom:1px solid var(--line-strong); }
         .stTabs [data-baseweb="tab"] {
-            background:#e2e8f0; border:1px solid var(--border); border-bottom:0;
-            border-radius:8px 8px 0 0; color:#1e293b; font-weight:700; padding:10px 16px;
+            background:transparent; border:0; border-bottom:2px solid transparent;
+            color:var(--muted); font-weight:600; padding:10px 14px; border-radius:0;
         }
-        .stTabs [aria-selected="true"] { background:var(--surface); color:var(--primary-dark); border-color:var(--primary); }
+        .stTabs [aria-selected="true"] { color:var(--accent); border-bottom-color:var(--accent); }
+
+        /* Buttons: single accent, tactile press */
         .stButton > button, .stDownloadButton > button {
-            background:var(--primary); color:#fff; border:1px solid var(--primary-dark);
-            border-radius:8px; font-weight:700;
+            background:var(--accent); color:#fff; border:1px solid var(--accent);
+            border-radius:var(--radius); font-weight:600; transition:transform .08s ease, filter .15s ease;
         }
-        .stButton > button:hover, .stDownloadButton > button:hover { background:var(--primary-dark); }
-        .note {
-            border:1px solid #93c5fd; border-left:6px solid var(--primary); border-radius:8px;
-            background:#dbeafe; padding:.85rem 1rem; margin:.5rem 0 1rem; color:#0f172a; font-weight:600;
+        .stButton > button:hover, .stDownloadButton > button:hover { filter:brightness(1.1); color:#fff; }
+        .stButton > button:active, .stDownloadButton > button:active { transform:translateY(1px); }
+
+        /* Unified callouts: subtle tint + left hairline, one shape */
+        .note, .risk, .insight {
+            border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--radius);
+            background:var(--accent-soft); padding:.8rem 1rem; margin:.5rem 0 1rem;
+            color:var(--ink); font-weight:500; line-height:1.5;
         }
-        .risk {
-            border:1px solid #f59e0b; border-left:6px solid var(--warning); border-radius:8px;
-            background:#fef3c7; padding:.85rem 1rem; margin:.5rem 0 1rem; color:#451a03; font-weight:600;
-        }
-        .insight {
-            border:1px solid #6ee7b7; border-left:6px solid #047857; border-radius:8px;
-            background:#d1fae5; padding:.85rem 1rem; margin:.5rem 0 1rem; color:#064e3b; font-weight:600;
-        }
+        .risk { border-left-color:var(--warn); background:var(--warn-soft); }
+        .insight { border-left-color:var(--good); background:var(--good-soft); }
+
+        [data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:var(--radius); }
+        hr { border-color:var(--line); }
         </style>
         """,
         unsafe_allow_html=True,
@@ -347,18 +376,18 @@ def inject_css():
 def render_header():
     st.markdown(
         f"""
-        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-          <span style="font-size:2rem;font-weight:800;color:#1e3a8a;">{PLATFORM}</span>
-          <span style="font-size:1.4rem;font-weight:700;color:#0f172a;">Premium Membership Growth Analytics</span>
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-top:.9rem;line-height:1.35;">
+          <span style="font-size:2rem;font-weight:800;color:#4c1d95;letter-spacing:-.03em;">{PLATFORM}</span>
+          <span style="font-size:1.4rem;font-weight:600;color:#1c1917;">Premium Membership Growth Analytics</span>
         </div>
-        <div style="color:#475569;font-weight:600;margin-top:2px;">
+        <div style="color:#78716c;font-weight:500;margin-top:2px;">
           Insightify 6.0 &nbsp;·&nbsp; {TEAM} &nbsp;·&nbsp; {", ".join(TEAM_MEMBERS)}
         </div>
         """,
         unsafe_allow_html=True,
     )
     st.write(
-        f"Who upgrades to {PLATFORM} premium and why — then turn the model scores into two "
+        f"Who upgrades to {PLATFORM} premium and why - then turn the model scores into two "
         "concrete growth plays: grow premium adoption, and win back high-value unhappy customers."
     )
     st.markdown(f'<div class="risk"><strong>Model note:</strong> {MODEL_WARNING}</div>', unsafe_allow_html=True)
@@ -367,13 +396,13 @@ def render_header():
 def persona_card(name, tagline, body, strategy_title, strategy_body):
     st.markdown(
         f"""
-        <div style="border:1px solid #cbd5e1;border-left:6px solid #1d4ed8;border-radius:10px;
-                    background:#fff;padding:1rem 1.2rem;box-shadow:0 1px 2px rgba(15,23,42,.08);">
-          <div style="font-size:1.15rem;font-weight:800;color:#1e3a8a;">Persona — {name}</div>
-          <div style="color:#475569;font-weight:700;margin:2px 0 8px;">{tagline}</div>
-          <div style="color:#0f172a;">{body}</div>
-          <div style="margin-top:10px;font-weight:800;color:#047857;">{strategy_title}</div>
-          <div style="color:#0f172a;">{strategy_body}</div>
+        <div style="border:1px solid #e7e5e4;border-left:3px solid #4c1d95;border-radius:10px;
+                    background:#fff;padding:1rem 1.2rem;box-shadow:0 1px 2px rgba(28,25,23,.04);">
+          <div style="font-size:1.15rem;font-weight:700;color:#4c1d95;letter-spacing:-.01em;">Persona - {name}</div>
+          <div style="color:#78716c;font-weight:600;margin:2px 0 8px;">{tagline}</div>
+          <div style="color:#1c1917;line-height:1.55;">{body}</div>
+          <div style="margin-top:10px;font-weight:700;color:#15803d;">{strategy_title}</div>
+          <div style="color:#1c1917;line-height:1.55;">{strategy_body}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -404,7 +433,7 @@ def render_overview(df, scored_df):
     st.markdown(
         '<div class="insight"><strong>Headline finding:</strong> Upgraders are NOT the heaviest '
         "spenders. Customers who upgrade have lower Spending_Score (~39 vs 56) and lower "
-        "Purchase_Frequency (~6.4 vs 8.9). Premium appeals to lighter, more deliberate users — "
+        "Purchase_Frequency (~6.4 vs 8.9). Premium appeals to lighter, more deliberate users - "
         "target casual customers, not your top spenders.</div>",
         unsafe_allow_html=True,
     )
@@ -414,7 +443,7 @@ def render_overview(df, scored_df):
         st.subheader("Upgrade Mix")
         counts = labeled["Membership_upgrade"].map({0: "Did not upgrade", 1: "Upgraded"}).value_counts()
         fig = px.pie(values=counts.values, names=counts.index, hole=0.55,
-                     color_discrete_sequence=["#94a3b8", "#1d4ed8"])
+                     color_discrete_sequence=["#a8a29e", "#4c1d95"])
         st.plotly_chart(style_fig(fig, 320), use_container_width=True)
     with right:
         st.subheader("Campaign Segments (all customers)")
@@ -448,7 +477,7 @@ def render_eda(df):
     st.subheader("Distribution Explorer")
     feature = st.selectbox("Behavior", NUMERIC_BEHAVIORS, index=NUMERIC_BEHAVIORS.index("Spending_Score"))
     fig = px.histogram(labeled, x=feature, color="Upgrade", barmode="overlay", nbins=40,
-                       color_discrete_map={"Did not upgrade": "#94a3b8", "Upgraded": "#1d4ed8"},
+                       color_discrete_map={"Did not upgrade": "#a8a29e", "Upgraded": "#4c1d95"},
                        marginal="box")
     st.plotly_chart(style_fig(fig, 420), use_container_width=True)
 
@@ -478,7 +507,7 @@ def render_drivers(df, model):
 
     st.markdown(
         '<div class="note"><strong>Read this honestly:</strong> Only Purchase_Frequency and '
-        "Spending_Score (and the engineered Spend_Efficiency) carry meaningful signal — both "
+        "Spending_Score (and the engineered Spend_Efficiency) carry meaningful signal - both "
         "negative. The rest hover near zero, which is exactly why no model beats ~0.70 ROC-AUC on "
         "this data. The fix is better data, not a fancier algorithm.</div>",
         unsafe_allow_html=True,
@@ -493,7 +522,7 @@ def render_drivers(df, model):
         imp["Feature"] = imp["Feature"].str.replace("num__", "").str.replace("cat__", "")
         st.subheader("Model Feature Importance (top 12)")
         fig = px.bar(imp.sort_values("Importance"), x="Importance", y="Feature", orientation="h",
-                     color_discrete_sequence=["#1d4ed8"])
+                     color_discrete_sequence=["#4c1d95"])
         st.plotly_chart(style_fig(fig, 420), use_container_width=True)
     except Exception:
         st.info("Model does not expose feature importances.")
@@ -513,17 +542,17 @@ def filter_targets(scored_df, controls):
 
 
 def render_campaign(scored_df, controls):
-    st.subheader("Strategy I — Grow Premium Adoption")
+    st.subheader("Strategy I - Grow Premium Adoption")
     persona_card(
-        "Rahul — The Occasional Optimizer",
+        "Rahul - The Occasional Optimizer",
         "Light, low-frequency user · modest spender · deliberate about value",
         "Corrected from the data: the customers our model ranks highest for upgrade are NOT the "
         "power spenders. They order rarely (~3 orders/month) and spend modestly (Spending Score ~18 "
-        "vs ~52 for the average customer). For an occasional user, a per-order delivery fee stings — "
+        "vs ~52 for the average customer). For an occasional user, a per-order delivery fee stings - "
         "so premium that removes that fee is exactly what makes their infrequent orders worth it.",
         "The play: \"Premium Pays for Itself\"",
-        "Lead with simple math — premium pays back in just a few orders via free/reduced delivery and "
-        "no surge — plus a low-commitment trial. Pitch value-per-order, not volume perks. Use the "
+        "Lead with simple math - premium pays back in just a few orders via free/reduced delivery and "
+        "no surge - plus a low-commitment trial. Pitch value-per-order, not volume perks. Use the "
         "target list below to reach every Occasional Optimizer at scale.",
     )
     st.write("")
@@ -560,7 +589,7 @@ def render_campaign(scored_df, controls):
         st.subheader("Action Mix (selected)")
         act = campaign["Recommended_Action"].value_counts().rename_axis("Action").reset_index(name="Customers")
         if len(act):
-            fig = px.bar(act, x="Customers", y="Action", orientation="h", color_discrete_sequence=["#1d4ed8"])
+            fig = px.bar(act, x="Customers", y="Action", orientation="h", color_discrete_sequence=["#4c1d95"])
             st.plotly_chart(style_fig(fig, 320), use_container_width=True)
         else:
             st.info("No selected targets. Relax filters or raise capacity.")
@@ -601,15 +630,15 @@ def render_campaign(scored_df, controls):
 
 
 # --------------------------------------------------------------------------- #
-# Tab: Strategy II — Win Back (Neha / High-Value Low-Rating)
+# Tab: Strategy II - Win Back (Neha / High-Value Low-Rating)
 # --------------------------------------------------------------------------- #
 def render_winback(scored_df, controls):
-    st.subheader("Strategy II — Win Back High-Value, Unhappy Customers")
+    st.subheader("Strategy II - Win Back High-Value, Unhappy Customers")
     persona_card(
         "Neha",
         "High spender · frequent orderer · low app rating · churn risk",
         "Neha spends heavily and orders often, but late deliveries and cold food dropped her rating. "
-        "She is high-value yet dissatisfied — the costliest customer to lose silently.",
+        "She is high-value yet dissatisfied - the costliest customer to lose silently.",
         "The play: \"Win Back the Food Lover\"",
         "Treat her like a VIP foodie, not a complaint ticket: proactive service recovery, priority "
         "support, and a goodwill perk BEFORE any upgrade pitch.",
@@ -641,7 +670,7 @@ def render_winback(scored_df, controls):
     )
     melt = compare.melt(id_vars="Metric", var_name="Group", value_name="Value")
     fig = px.bar(melt, x="Metric", y="Value", color="Group", barmode="group",
-                 color_discrete_map={"High-Value/Low-Rating": "#b91c1c", "Other Customers": "#94a3b8"})
+                 color_discrete_map={"High-Value/Low-Rating": "#b91c1c", "Other Customers": "#a8a29e"})
     st.plotly_chart(style_fig(fig, 340), use_container_width=True)
 
     st.subheader("Win-Back Target List")
@@ -668,7 +697,7 @@ def render_model_health(model, df, threshold):
     st.subheader("Model Health")
     if METADATA_PATH.exists():
         meta = json.loads(METADATA_PATH.read_text(encoding="utf-8"))
-        st.caption(f"Saved model: {meta.get('model_name', 'scikit-learn pipeline')} — {meta.get('selection_reason', '')}")
+        st.caption(f"Saved model: {meta.get('model_name', 'scikit-learn pipeline')} - {meta.get('selection_reason', '')}")
     st.markdown(f'<div class="risk"><strong>Honest read:</strong> {MODEL_WARNING}</div>', unsafe_allow_html=True)
 
     metrics, threshold_df, decile_df, base_rate, roc = evaluate_model(model, df, threshold)
@@ -686,15 +715,15 @@ def render_model_health(model, df, threshold):
         st.subheader("ROC Curve")
         fpr, tpr = roc
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name="Model", line=dict(color="#1d4ed8", width=3)))
+        fig.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name="Model", line=dict(color="#4c1d95", width=3)))
         fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Random",
-                                 line=dict(color="#94a3b8", dash="dash")))
+                                 line=dict(color="#a8a29e", dash="dash")))
         fig.update_layout(xaxis_title="False Positive Rate", yaxis_title="True Positive Rate")
         st.plotly_chart(style_fig(fig, 360), use_container_width=True)
     with right:
         st.subheader("Cumulative Lift by Decile")
-        fig = px.line(decile_df, x="Top %", y="Lift", markers=True, color_discrete_sequence=["#047857"])
-        fig.add_hline(y=1.0, line_dash="dash", line_color="#94a3b8")
+        fig = px.line(decile_df, x="Top %", y="Lift", markers=True, color_discrete_sequence=["#15803d"])
+        fig.add_hline(y=1.0, line_dash="dash", line_color="#a8a29e")
         st.plotly_chart(style_fig(fig, 360), use_container_width=True)
     st.caption("Lift chart is the real campaign value: contact the top deciles to hit upgraders far above base rate.")
 
@@ -707,10 +736,10 @@ def render_model_health(model, df, threshold):
     st.subheader("Recommended Next Steps")
     st.markdown(
         """
-        - **Target by lift / top-N, not a fixed 0.50 cutoff** — pick how many to contact, then take the top of the ranking.
-        - **Collect better signal** — the data ceiling is ~0.70 AUC; richer behavioral data would help more than any algorithm swap.
+        - **Target by lift / top-N, not a fixed 0.50 cutoff** - pick how many to contact, then take the top of the ranking.
+        - **Collect better signal** - the data ceiling is ~0.70 AUC; richer behavioral data would help more than any algorithm swap.
         - **Optimize for campaign profit or recall** at acceptable precision, not plain accuracy.
-        - **Track real campaign response** — organic upgrade prediction is not the same as offer-response modeling.
+        - **Track real campaign response** - organic upgrade prediction is not the same as offer-response modeling.
         """
     )
 
@@ -777,8 +806,8 @@ def main():
         "Overview",
         "Problem & EDA",
         "Predictive Modelling",
-        "Strategy I — Grow Premium",
-        "Strategy II — Win Back",
+        "Strategy I - Grow Premium",
+        "Strategy II - Win Back",
     ])
     with tabs[0]:
         render_overview(df, scored_df)
@@ -794,7 +823,7 @@ def main():
         render_winback(scored_df, controls)
 
     st.divider()
-    st.caption(f"{PLATFORM} · Insightify 6.0 · {TEAM} — {', '.join(TEAM_MEMBERS)}")
+    st.caption(f"{PLATFORM} · Insightify 6.0 · {TEAM} - {', '.join(TEAM_MEMBERS)}")
 
 
 if __name__ == "__main__":
