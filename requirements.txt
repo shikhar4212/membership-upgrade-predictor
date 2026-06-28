@@ -1,7 +1,11 @@
-streamlit==1.40.0
-pandas==2.2.3
-numpy==2.1.3
-# IMPORTANT: scikit-learn must match the version used to TRAIN upgrade_model.pkl.
-# If the app crashes on model load, set this to your training version.
-scikit-learn==1.5.2
-joblib==1.4.2
+﻿# Recommended runtime: Python 3.11 or 3.12.
+# Do not use Python 3.14 for this project yet: Streamlit depends on pyarrow,
+# and pyarrow wheels may be unavailable or unstable for that interpreter.
+streamlit==1.51.0
+pandas==2.3.3
+numpy==2.3.5
+# scikit-learn pinned to the version used to train upgrade_model.pkl.
+# Changing this may break model loading.
+scikit-learn==1.7.2
+joblib==1.5.2
+plotly==5.24.1

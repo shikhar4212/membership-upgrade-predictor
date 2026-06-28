@@ -1,0 +1,52 @@
+{
+  "model_name": "GradientBoostingClassifier",
+  "model_purpose": "Premium upgrade campaign targeting",
+  "selection_reason": "Best PR-AUC and top-decile lift among tested local candidates.",
+  "holdout_split": "80/20 stratified split, random_state=42",
+  "metrics": {
+    "accuracy": 0.8305555555555556,
+    "precision": 0.9705882352941176,
+    "recall": 0.3548387096774194,
+    "f1": 0.5196850393700787,
+    "roc_auc": 0.6999516733115864,
+    "pr_auc": 0.6111780860151219,
+    "base_upgrade_rate": 0.25833333333333336,
+    "top_decile_upgrade_rate": 0.9444444444444444,
+    "top_decile_lift": 3.655913978494623
+  },
+  "threshold_tradeoff": [
+    {
+      "threshold": 0.2,
+      "targeted_users": 194,
+      "precision": 0.33505154639175255,
+      "recall": 0.6989247311827957,
+      "f1": 0.4529616724738676
+    },
+    {
+      "threshold": 0.35,
+      "targeted_users": 60,
+      "precision": 0.6666666666666666,
+      "recall": 0.43010752688172044,
+      "f1": 0.5228758169934641
+    },
+    {
+      "threshold": 0.5,
+      "targeted_users": 34,
+      "precision": 0.9705882352941176,
+      "recall": 0.3548387096774194,
+      "f1": 0.5196850393700787
+    },
+    {
+      "threshold": 0.65,
+      "targeted_users": 31,
+      "precision": 1.0,
+      "recall": 0.3333333333333333,
+      "f1": 0.5
+    }
+  ],
+  "notes": [
+    "Model is useful for ranking and prioritization.",
+    "Recall remains limited at the default threshold, so campaign validation is required.",
+    "Organic upgrade prediction is not the same as offer-response modeling."
+  ]
+}
