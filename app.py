@@ -385,19 +385,11 @@ def render_header():
 
 
 def persona_card(name, tagline, body, strategy_title, strategy_body):
-    st.markdown(
-        f"""
-        <div style="border:1px solid #e7e5e4;border-left:3px solid #4c1d95;border-radius:10px;
-                    background:#fff;padding:1rem 1.2rem;box-shadow:0 1px 2px rgba(28,25,23,.04);">
-          <div style="font-size:1.15rem;font-weight:700;color:#4c1d95;letter-spacing:-.01em;">Persona - {name}</div>
-          <div style="color:#78716c;font-weight:600;margin:2px 0 8px;">{tagline}</div>
-          <div style="color:#1c1917;line-height:1.55;">{body}</div>
-          <div style="margin-top:10px;font-weight:700;color:#15803d;">{strategy_title}</div>
-          <div style="color:#1c1917;line-height:1.55;">{strategy_body}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown(f"#### Persona: {name}")
+    st.caption(tagline)
+    st.write(body)
+    st.markdown(f"**{strategy_title}**")
+    st.write(strategy_body)
 
 
 # --------------------------------------------------------------------------- #
