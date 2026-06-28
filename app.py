@@ -5,7 +5,7 @@ to premium and WHY, scores every customer with a trained model, and turns those
 scores into a prioritized, value-estimated campaign target list.
 
 Honest framing: the dataset carries real signal in only a couple of behaviors, so
-the model is a directional ranking aid (ROC-AUC ~0.70), not an autopilot.
+the model is a directional ranking aid (ROC-AUC around 0.70), not an autopilot.
 """
 
 import json
@@ -356,15 +356,6 @@ def inject_css():
         .stButton > button:hover, .stDownloadButton > button:hover { filter:brightness(1.1); color:#fff; }
         .stButton > button:active, .stDownloadButton > button:active { transform:translateY(1px); }
 
-        /* Unified callouts: subtle tint + left hairline, one shape */
-        .note, .risk, .insight {
-            border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:var(--radius);
-            background:var(--accent-soft); padding:.8rem 1rem; margin:.5rem 0 1rem;
-            color:var(--ink); font-weight:500; line-height:1.5;
-        }
-        .risk { border-left-color:var(--warn); background:var(--warn-soft); }
-        .insight { border-left-color:var(--good); background:var(--good-soft); }
-
         [data-testid="stDataFrame"] { border:1px solid var(--line); border-radius:var(--radius); }
         hr { border-color:var(--line); }
         </style>
@@ -378,7 +369,7 @@ def render_header():
         f"""
         <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-top:.9rem;line-height:1.35;">
           <span style="font-size:2rem;font-weight:800;color:#4c1d95;letter-spacing:-.03em;">{PLATFORM}</span>
-          <span style="font-size:1.4rem;font-weight:600;color:#1c1917;">Premium Membership Growth Analytics</span>
+          <span style="font-size:1.4rem;font-weight:600;color:#1c1917;">Membership Upgrade Dashboard</span>
         </div>
         <div style="color:#78716c;font-weight:500;margin-top:2px;">
           Insightify 6.0 &nbsp;·&nbsp; {TEAM} &nbsp;·&nbsp; {", ".join(TEAM_MEMBERS)}
@@ -387,10 +378,10 @@ def render_header():
         unsafe_allow_html=True,
     )
     st.write(
-        f"Who upgrades to {PLATFORM} premium and why - then turn the model scores into two "
-        "concrete growth plays: grow premium adoption, and win back high-value unhappy customers."
+        f"Find out which {PLATFORM} customers are most likely to upgrade, and what to do about it: "
+        "grow upgrades, and win back unhappy high-value customers."
     )
-    st.markdown(f'<div class="risk"><strong>Model note:</strong> {MODEL_WARNING}</div>', unsafe_allow_html=True)
+    st.caption(f"Model note: {MODEL_WARNING}")
 
 
 def persona_card(name, tagline, body, strategy_title, strategy_body):
@@ -424,18 +415,14 @@ def render_overview(df, scored_df):
     c5.metric("Avg Upgrade Probability", f"{scored_df['Upgrade_Probability'].mean():.1%}")
 
     st.markdown(
-        f'<div class="note"><strong>Problem statement.</strong> {PLATFORM} wants to grow premium '
-        "membership revenue. Demographics (age, income) barely differ across tiers, so the answer "
-        "is in <em>behavior</em>. This dashboard finds the behavioral signals, scores every customer, "
-        "and frames two growth strategies built on real personas.</div>",
-        unsafe_allow_html=True,
+        f"**The problem.** {PLATFORM} wants more upgrades. Age and income barely differ across "
+        "tiers, so the answer is in how people behave, not who they are. This dashboard finds those "
+        "behaviors, scores every customer, and turns that into two clear plans."
     )
     st.markdown(
-        '<div class="insight"><strong>Headline finding:</strong> Upgraders are NOT the heaviest '
-        "spenders. Customers who upgrade have lower Spending_Score (~39 vs 56) and lower "
-        "Purchase_Frequency (~6.4 vs 8.9). Premium appeals to lighter, more deliberate users - "
-        "target casual customers, not your top spenders.</div>",
-        unsafe_allow_html=True,
+        "**Main finding.** People who upgrade are not the biggest spenders. They actually spend less "
+        "(score 39 vs 56) and order less often (6.4 vs 8.9 times). Upgrades come from lighter, more "
+        "careful users, so target casual customers, not your top spenders."
     )
 
     left, right = st.columns(2)
@@ -506,11 +493,9 @@ def render_drivers(df, model):
     st.plotly_chart(style_fig(fig, 460), use_container_width=True)
 
     st.markdown(
-        '<div class="note"><strong>Read this honestly:</strong> Only Purchase_Frequency and '
-        "Spending_Score (and the engineered Spend_Efficiency) carry meaningful signal - both "
-        "negative. The rest hover near zero, which is exactly why no model beats ~0.70 ROC-AUC on "
-        "this data. The fix is better data, not a fancier algorithm.</div>",
-        unsafe_allow_html=True,
+        "**The honest read.** Only Purchase_Frequency and Spending_Score (plus the built "
+        "Spend_Efficiency) really matter, and both point down. The rest sit near zero, which is why "
+        "no model beats 0.70 ROC-AUC here. Better data would help more than a fancier algorithm."
     )
 
     # Model-side importance, if the pipeline exposes it.
@@ -545,15 +530,15 @@ def render_campaign(scored_df, controls):
     st.subheader("Strategy I - Grow Premium Adoption")
     persona_card(
         "Rahul - The Occasional Optimizer",
-        "Light, low-frequency user · modest spender · deliberate about value",
-        "Corrected from the data: the customers our model ranks highest for upgrade are NOT the "
-        "power spenders. They order rarely (~3 orders/month) and spend modestly (Spending Score ~18 "
-        "vs ~52 for the average customer). For an occasional user, a per-order delivery fee stings - "
-        "so premium that removes that fee is exactly what makes their infrequent orders worth it.",
-        "The play: \"Premium Pays for Itself\"",
-        "Lead with simple math - premium pays back in just a few orders via free/reduced delivery and "
-        "no surge - plus a low-commitment trial. Pitch value-per-order, not volume perks. Use the "
-        "target list below to reach every Occasional Optimizer at scale.",
+        "Light user · spends modestly · careful about value",
+        "Straight from the data: the customers most likely to upgrade are not the big spenders. They "
+        "order rarely (about 3 times a month) and spend little (score 18 vs 52 for the average "
+        "customer). When you order rarely, the delivery fee on each order hurts, so a plan that "
+        "removes that fee is what finally makes upgrading worth it for them.",
+        "The plan: show how fast it pays off",
+        "Lead with simple math: the plan pays for itself in just a few orders through free delivery, "
+        "plus an easy trial. Sell value per order, not bulk perks. Use the target list below to reach "
+        "every customer like this.",
     )
     st.write("")
 
@@ -569,10 +554,9 @@ def render_campaign(scored_df, controls):
     k4.metric("Expected Upgrades", f"{campaign['Expected_Upgrades'].sum():,.1f}")
     k5.metric("Expected Profit", format_currency(campaign["Expected_Profit"].sum()))
 
-    st.markdown(
-        '<div class="note">Workflow: tune campaign rules in the sidebar, review the segment + action '
-        "mix, export the list, then track real conversion after outreach.</div>",
-        unsafe_allow_html=True,
+    st.caption(
+        "How to use this: set the rules in the sidebar, check the segment and action mix, export the "
+        "list, then track real conversions after you reach out."
     )
 
     left, right = st.columns(2)
@@ -636,12 +620,12 @@ def render_winback(scored_df, controls):
     st.subheader("Strategy II - Win Back High-Value, Unhappy Customers")
     persona_card(
         "Neha",
-        "High spender · frequent orderer · low app rating · churn risk",
-        "Neha spends heavily and orders often, but late deliveries and cold food dropped her rating. "
-        "She is high-value yet dissatisfied - the costliest customer to lose silently.",
-        "The play: \"Win Back the Food Lover\"",
-        "Treat her like a VIP foodie, not a complaint ticket: proactive service recovery, priority "
-        "support, and a goodwill perk BEFORE any upgrade pitch.",
+        "High spender · orders often · low app rating · at risk of leaving",
+        "Neha spends a lot and orders often, but late deliveries and cold food dropped her rating. "
+        "She is valuable but unhappy, and the most expensive kind of customer to lose quietly.",
+        "The plan: win her back first",
+        "Treat her like a top customer, not a complaint. Fix the service issue, give priority support "
+        "and a goodwill perk before pitching any upgrade.",
     )
     st.write("")
 
@@ -655,10 +639,9 @@ def render_winback(scored_df, controls):
     k4.metric("vs Rest (Spending)", f"{other['Spending_Score'].mean():.0f}")
 
     st.markdown(
-        f'<div class="risk"><strong>Why it matters:</strong> only ~{len(hv) / len(scored_df):.1%} of '
-        "customers, but they spend far above average. Losing them quietly costs more than any single "
-        "failed upgrade. Recover service first, monetize later.</div>",
-        unsafe_allow_html=True,
+        f"**Why it matters.** Just {len(hv) / len(scored_df):.1%} of customers, but they spend far "
+        "above average. Losing them quietly costs more than any one failed upgrade. Fix the service "
+        "first, sell later."
     )
 
     compare = pd.DataFrame(
@@ -698,7 +681,7 @@ def render_model_health(model, df, threshold):
     if METADATA_PATH.exists():
         meta = json.loads(METADATA_PATH.read_text(encoding="utf-8"))
         st.caption(f"Saved model: {meta.get('model_name', 'scikit-learn pipeline')} - {meta.get('selection_reason', '')}")
-    st.markdown(f'<div class="risk"><strong>Honest read:</strong> {MODEL_WARNING}</div>', unsafe_allow_html=True)
+    st.caption(f"Honest read: {MODEL_WARNING}")
 
     metrics, threshold_df, decile_df, base_rate, roc = evaluate_model(model, df, threshold)
 
@@ -737,7 +720,7 @@ def render_model_health(model, df, threshold):
     st.markdown(
         """
         - **Target by lift / top-N, not a fixed 0.50 cutoff** - pick how many to contact, then take the top of the ranking.
-        - **Collect better signal** - the data ceiling is ~0.70 AUC; richer behavioral data would help more than any algorithm swap.
+        - **Collect better signal** - the data ceiling is about 0.70 AUC; richer behavioral data would help more than any algorithm swap.
         - **Optimize for campaign profit or recall** at acceptable precision, not plain accuracy.
         - **Track real campaign response** - organic upgrade prediction is not the same as offer-response modeling.
         """
