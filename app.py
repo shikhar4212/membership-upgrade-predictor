@@ -515,14 +515,16 @@ def filter_targets(scored_df, controls):
 def render_campaign(scored_df, controls):
     st.subheader("Strategy I — Grow Premium Adoption")
     persona_card(
-        "Rahul",
-        "Busy professional · frequent user · still on Basic tier",
-        f"Rahul is ~43, earns ~$59K, and orders 5–6 times a month at ~$60 per order. He explores "
-        f"cuisines and values convenience, but never upgraded. He is exactly the lighter, deliberate "
-        f"user our model ranks highly for premium intent.",
-        "The play: Weekend Explorer Deals",
-        "Offer a premium trial with reduced delivery fees + curated weekend cuisine drops. Use the "
-        "target list below to find every Rahul-like customer at scale.",
+        "Rahul — The Occasional Optimizer",
+        "Light, low-frequency user · modest spender · deliberate about value",
+        "Corrected from the data: the customers our model ranks highest for upgrade are NOT the "
+        "power spenders. They order rarely (~3 orders/month) and spend modestly (Spending Score ~18 "
+        "vs ~52 for the average customer). For an occasional user, a per-order delivery fee stings — "
+        "so premium that removes that fee is exactly what makes their infrequent orders worth it.",
+        "The play: \"Premium Pays for Itself\"",
+        "Lead with simple math — premium pays back in just a few orders via free/reduced delivery and "
+        "no surge — plus a low-commitment trial. Pitch value-per-order, not volume perks. Use the "
+        "target list below to reach every Occasional Optimizer at scale.",
     )
     st.write("")
 
