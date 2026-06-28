@@ -77,6 +77,11 @@ NUMERIC_BEHAVIORS = [
     "Last_Month_Complaints",
 ]
 
+# Brand + narrative from the BITSPilani_TeamMuggles deck (Insightify 6.0).
+PLATFORM = "CraveConnect"
+TEAM = "The Muggles"
+TEAM_MEMBERS = ["Ankit Nandi", "Shikhar Panthari", "Abhinav Singh"]
+
 PITCHABLE_SEGMENTS = ["High intent", "Persuadable"]
 SEGMENT_COLORS = {
     "High intent": "#047857",
@@ -340,12 +345,39 @@ def inject_css():
 
 
 def render_header():
-    st.title("Premium Membership Upgrade — Analytics Workbench")
+    st.markdown(
+        f"""
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+          <span style="font-size:2rem;font-weight:800;color:#1e3a8a;">{PLATFORM}</span>
+          <span style="font-size:1.4rem;font-weight:700;color:#0f172a;">Premium Membership Growth Analytics</span>
+        </div>
+        <div style="color:#475569;font-weight:600;margin-top:2px;">
+          Insightify 6.0 &nbsp;·&nbsp; {TEAM} &nbsp;·&nbsp; {", ".join(TEAM_MEMBERS)}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.write(
-        "Understand who upgrades to premium and why, score every customer, and build a "
-        "prioritized campaign target list with expected value."
+        f"Who upgrades to {PLATFORM} premium and why — then turn the model scores into two "
+        "concrete growth plays: grow premium adoption, and win back high-value unhappy customers."
     )
     st.markdown(f'<div class="risk"><strong>Model note:</strong> {MODEL_WARNING}</div>', unsafe_allow_html=True)
+
+
+def persona_card(name, tagline, body, strategy_title, strategy_body):
+    st.markdown(
+        f"""
+        <div style="border:1px solid #cbd5e1;border-left:6px solid #1d4ed8;border-radius:10px;
+                    background:#fff;padding:1rem 1.2rem;box-shadow:0 1px 2px rgba(15,23,42,.08);">
+          <div style="font-size:1.15rem;font-weight:800;color:#1e3a8a;">Persona — {name}</div>
+          <div style="color:#475569;font-weight:700;margin:2px 0 8px;">{tagline}</div>
+          <div style="color:#0f172a;">{body}</div>
+          <div style="margin-top:10px;font-weight:800;color:#047857;">{strategy_title}</div>
+          <div style="color:#0f172a;">{strategy_body}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -362,6 +394,13 @@ def render_overview(df, scored_df):
     c4.metric("High-intent Customers", f"{(scored_df['Segment'] == 'High intent').sum():,}")
     c5.metric("Avg Upgrade Probability", f"{scored_df['Upgrade_Probability'].mean():.1%}")
 
+    st.markdown(
+        f'<div class="note"><strong>Problem statement.</strong> {PLATFORM} wants to grow premium '
+        "membership revenue. Demographics (age, income) barely differ across tiers, so the answer "
+        "is in <em>behavior</em>. This dashboard finds the behavioral signals, scores every customer, "
+        "and frames two growth strategies built on real personas.</div>",
+        unsafe_allow_html=True,
+    )
     st.markdown(
         '<div class="insight"><strong>Headline finding:</strong> Upgraders are NOT the heaviest '
         "spenders. Customers who upgrade have lower Spending_Score (~39 vs 56) and lower "
@@ -474,6 +513,19 @@ def filter_targets(scored_df, controls):
 
 
 def render_campaign(scored_df, controls):
+    st.subheader("Strategy I — Grow Premium Adoption")
+    persona_card(
+        "Rahul",
+        "Busy professional · frequent user · still on Basic tier",
+        f"Rahul is ~43, earns ~$59K, and orders 5–6 times a month at ~$60 per order. He explores "
+        f"cuisines and values convenience, but never upgraded. He is exactly the lighter, deliberate "
+        f"user our model ranks highly for premium intent.",
+        "The play: Weekend Explorer Deals",
+        "Offer a premium trial with reduced delivery fees + curated weekend cuisine drops. Use the "
+        "target list below to find every Rahul-like customer at scale.",
+    )
+    st.write("")
+
     eligible = filter_targets(scored_df, controls)
     campaign = estimate_campaign_value(
         eligible, controls["campaign_capacity"], controls["membership_value"], controls["offer_cost"]
@@ -544,6 +596,67 @@ def render_campaign(scored_df, controls):
         view[look_cols].head(50).style.format({"Upgrade_Probability": "{:.1%}", "Priority_Score": "{:.2f}"}),
         use_container_width=True, hide_index=True,
     )
+
+
+# --------------------------------------------------------------------------- #
+# Tab: Strategy II — Win Back (Neha / High-Value Low-Rating)
+# --------------------------------------------------------------------------- #
+def render_winback(scored_df, controls):
+    st.subheader("Strategy II — Win Back High-Value, Unhappy Customers")
+    persona_card(
+        "Neha",
+        "High spender · frequent orderer · low app rating · churn risk",
+        "Neha spends heavily and orders often, but late deliveries and cold food dropped her rating. "
+        "She is high-value yet dissatisfied — the costliest customer to lose silently.",
+        "The play: \"Win Back the Food Lover\"",
+        "Treat her like a VIP foodie, not a complaint ticket: proactive service recovery, priority "
+        "support, and a goodwill perk BEFORE any upgrade pitch.",
+    )
+    st.write("")
+
+    hv = scored_df[(scored_df["Spending_Score"] > 70) & (scored_df["App_Rating"] < 3)].copy()
+    other = scored_df[~((scored_df["Spending_Score"] > 70) & (scored_df["App_Rating"] < 3))]
+
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("High-Value / Low-Rating", f"{len(hv):,}")
+    k2.metric("Share of base", f"{len(hv) / len(scored_df):.1%}")
+    k3.metric("Avg Spending Score", f"{hv['Spending_Score'].mean():.0f}")
+    k4.metric("vs Rest (Spending)", f"{other['Spending_Score'].mean():.0f}")
+
+    st.markdown(
+        f'<div class="risk"><strong>Why it matters:</strong> only ~{len(hv) / len(scored_df):.1%} of '
+        "customers, but they spend far above average. Losing them quietly costs more than any single "
+        "failed upgrade. Recover service first, monetize later.</div>",
+        unsafe_allow_html=True,
+    )
+
+    compare = pd.DataFrame(
+        {
+            "Metric": ["Purchase Frequency", "Spending Score", "Avg Order Value"],
+            "High-Value/Low-Rating": [hv["Purchase_Frequency"].mean(), hv["Spending_Score"].mean(), hv["Avg_Order_Value"].mean()],
+            "Other Customers": [other["Purchase_Frequency"].mean(), other["Spending_Score"].mean(), other["Avg_Order_Value"].mean()],
+        }
+    )
+    melt = compare.melt(id_vars="Metric", var_name="Group", value_name="Value")
+    fig = px.bar(melt, x="Metric", y="Value", color="Group", barmode="group",
+                 color_discrete_map={"High-Value/Low-Rating": "#b91c1c", "Other Customers": "#94a3b8"})
+    st.plotly_chart(style_fig(fig, 340), use_container_width=True)
+
+    st.subheader("Win-Back Target List")
+    cols = ["CustomerID", "Name", "Membership_Level", "Spending_Score", "App_Rating",
+            "Last_Month_Complaints", "Purchase_Frequency", "Avg_Order_Value", "Recommended_Action"]
+    cols = [c for c in cols if c in hv.columns]
+    if len(hv):
+        view = hv.sort_values("Spending_Score", ascending=False)[cols]
+        st.dataframe(
+            view.style.format({"Avg_Order_Value": "${:,.0f}"}),
+            use_container_width=True, hide_index=True,
+        )
+        csv = view.to_csv(index=False).encode("utf-8")
+        st.download_button("Download win-back list", data=csv,
+                           file_name="craveconnect_winback_targets.csv", mime="text/csv", type="primary")
+    else:
+        st.info("No high-value/low-rating customers in the current data.")
 
 
 # --------------------------------------------------------------------------- #
@@ -658,17 +771,28 @@ def main():
 
     controls = render_sidebar(scored_df)
 
-    tabs = st.tabs(["Overview", "Who Upgrades (EDA)", "Drivers", "Predict & Target", "Model Health"])
+    tabs = st.tabs([
+        "Overview",
+        "Problem & EDA",
+        "Predictive Modelling",
+        "Strategy I — Grow Premium",
+        "Strategy II — Win Back",
+    ])
     with tabs[0]:
         render_overview(df, scored_df)
     with tabs[1]:
         render_eda(df)
     with tabs[2]:
         render_drivers(df, model)
+        st.divider()
+        render_model_health(model, df, controls["threshold"])
     with tabs[3]:
         render_campaign(scored_df, controls)
     with tabs[4]:
-        render_model_health(model, df, controls["threshold"])
+        render_winback(scored_df, controls)
+
+    st.divider()
+    st.caption(f"{PLATFORM} · Insightify 6.0 · {TEAM} — {', '.join(TEAM_MEMBERS)}")
 
 
 if __name__ == "__main__":
