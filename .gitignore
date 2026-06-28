@@ -17,3 +17,6 @@ Thumbs.db
 
 # Streamlit secrets
 .streamlit/secrets.toml
+
+# Exploratory model from notebook (production model is built by train_model.py)
+upgrade_model_notebook_rf.pkl
