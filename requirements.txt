@@ -1,4 +1,4 @@
-﻿# Recommended runtime: Python 3.11 or 3.12.
+# Recommended runtime: Python 3.11 or 3.12.
 # Do not use Python 3.14 for this project yet: Streamlit depends on pyarrow,
 # and pyarrow wheels may be unavailable or unstable for that interpreter.
 streamlit==1.51.0
